@@ -1,10 +1,13 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const panic = std.debug.panic;
+const join = std.fs.path.join;
 
 // const c = @cImport({
 // @cInclude("GLFW/glfw3.h");
 // });
+
+const Shader = @import("shader.zig").Shader;
 
 const c = @cImport({
     @cInclude("glad/glad.h");
@@ -18,26 +21,30 @@ const c = @cImport({
 const SCR_WIDTH: u32 = 1920;
 const SCR_HEIGHT: u32 = 1080;
 
-// const vertexShaderSource: [:0]const u8 =
 const vertexShaderSource: [:0]const u8 =
     \\#version 330 core
     \\layout (location = 0) in vec3 aPos;
     \\void main()
     \\{
-    \\  gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-    \\};
+    \\   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    \\}
 ;
-
 const fragmentShaderSource: [:0]const u8 =
     \\#version 330 core
     \\out vec4 FragColor;
     \\void main()
     \\{
-    \\  FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-    \\};
+    \\   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    \\}
 ;
 
 pub fn main() !void {
+    const allocator = std.heap.page_allocator;
+    const vertPath = try join(allocator, &[_][]const u8{ "shaders", "1_3_shaders.vert" });
+    _ = vertPath;
+    const fragPath = try join(allocator, &[_][]const u8{ "shaders", "1_3_shaders.frag" });
+    _ = fragPath;
+
     const ok = c.glfwInit();
     if (ok == 0) {
         panic("Failed to initialize GLFW\n", .{});
@@ -50,7 +57,7 @@ pub fn main() !void {
     c.glfwWindowHint(c.GLFW_OPENGL_PROFILE, c.GLFW_OPENGL_CORE_PROFILE);
 
     // gflw: initialize and configure
-    var window = c.glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Learning OpenGL Chapter 1", null, null);
+    var window = c.glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Learning OpenGL Chapter 3", null, null);
     if (window == null) {
         panic("Failed to create GLFW window\n", .{});
     }
@@ -112,7 +119,7 @@ pub fn main() !void {
     const vertices = [_]f32{
         0.5, 0.5, 0.0, // top right
         0.5, -0.5, 0.0, //bottom right
-        -0, 5, -0.5, 0.0, //bottom left
+        -0.5, -0.5, 0.0, //bottom left
         -0.5, 0.5, 0.0, // top left
     };
 
